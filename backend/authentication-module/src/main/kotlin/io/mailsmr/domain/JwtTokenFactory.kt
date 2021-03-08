@@ -3,6 +3,8 @@ package io.mailsmr.domain
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor
+import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.stereotype.Service
 import java.security.InvalidKeyException
 import java.time.Clock
@@ -24,6 +26,11 @@ class JwtTokenFactory(
 
     fun fromRequest(request: HttpServletRequest): JwtAccessToken? {
         val authorizationHeader = request.getHeader("Authorization") ?: return null
+        return fromAuthorizationHeader(authorizationHeader)
+    }
+
+    fun fromStompHeaderAccessor(accessor: StompHeaderAccessor): JwtAccessToken? { // TODO test
+        val authorizationHeader = accessor.getFirstNativeHeader("Authorization") ?: return null
         return fromAuthorizationHeader(authorizationHeader)
     }
 

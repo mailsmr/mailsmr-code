@@ -1,6 +1,5 @@
 package io.mailsmr.config
 
-import io.mailsmr.application.AuthenticationRequestFilter
 import io.mailsmr.application.JWTAuthenticationEntryPoint
 import io.mailsmr.interfaces.rest.AuthenticationApiPaths.AUTHENTICATION_BASE_PATH
 import io.mailsmr.interfaces.rest.AuthenticationApiPaths.POST__CREATE_AUTHENTICATION_TOKEN_PATH
@@ -41,11 +40,12 @@ internal class WebSecurityConfig(
                 "$AUTHENTICATION_BASE_PATH$POST__USE_REFRESH_TOKEN_PATH",
             ).permitAll() // authentication endpiont
             .antMatchers(HttpMethod.POST, USER_BASE_PATH).permitAll() // user endpoint
+            .antMatchers("/ws/**").permitAll() // web socket TODO make more specific
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         httpSecurity.addFilterBefore(authenticationRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
         httpSecurity.cors().configurationSource(corsConfigurationSource())
@@ -54,7 +54,8 @@ internal class WebSecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.addAllowedOrigin("*")
+        configuration.allowCredentials = true
+        configuration.addAllowedOrigin("http://localhost:4200")
         configuration.addAllowedHeader("*")
         configuration.addAllowedMethod("*")
         val source = UrlBasedCorsConfigurationSource()

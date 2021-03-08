@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":persistence-module"))
     implementation(project(":user-management-module"))
     implementation(project(":authentication-module"))
+    implementation(project(":mail-management-module"))
 
     //  - SECURITY
     implementation("org.springframework.boot:spring-boot-starter-security")

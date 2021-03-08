@@ -1,9 +1,7 @@
 package io.mailsmr.application
 
 import io.mailsmr.domain.JwtTokenFactory
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -26,22 +24,19 @@ class AuthenticationRequestFilter(
     private fun setAuthenticationForContext(request: HttpServletRequest) {
         val accessToken = jwtTokenFactory.fromRequest(request)
 
-        if (hasAuthenticationInformation() &&
-            accessToken != null && accessToken.isViable() && !accessToken.isExpired() && accessToken.isUsernameSet()
-        ) {
-            val userDetails: UserDetails =
-                authenticationUserDetailsService.loadUserByUsername(accessToken.getUsername()!!)
+        if (accessToken != null) request.setAttribute("expired", accessToken.isExpired())
 
-            val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.authorities
-            )
+        if (hasNoAuthenticationInformation()) {
+            val abstractAuthenticationToken =
+                authenticationUserDetailsService.getAuthenticationTokenFromAccessToken(accessToken)
 
-            usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-
-            SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
+            if (abstractAuthenticationToken != null) {
+                abstractAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                SecurityContextHolder.getContext().authentication = abstractAuthenticationToken
+            }
         }
     }
 
 
-    private fun hasAuthenticationInformation() = SecurityContextHolder.getContext().authentication == null
+    private fun hasNoAuthenticationInformation() = SecurityContextHolder.getContext().authentication == null
 }

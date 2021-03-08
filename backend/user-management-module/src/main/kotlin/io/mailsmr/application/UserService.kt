@@ -15,10 +15,15 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
-    fun getUserFromHttpServletRequest(request: HttpServletRequest): User? {
-        val username = request.userPrincipal.name
+    fun getUserByUsername(username: String): User? {
         return userRepository.findByUsername(username)
     }
+
+    fun getUserFromHttpServletRequest(request: HttpServletRequest): User? {
+        val username = request.userPrincipal.name
+        return getUserByUsername(username)
+    }
+
 
     fun userExists(username: String): Boolean {
         return userRepository.existsByUsername(username)
@@ -63,5 +68,6 @@ class UserService(
 
         userRepository.saveAndFlush(user)
     }
+
 
 }

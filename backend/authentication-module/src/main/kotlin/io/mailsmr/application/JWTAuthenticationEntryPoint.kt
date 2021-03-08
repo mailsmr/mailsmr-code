@@ -14,6 +14,13 @@ class JWTAuthenticationEntryPoint : AuthenticationEntryPoint {
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+        val isExpired = request.getAttribute("expired") as Boolean? ?: false
+
+        if (isExpired) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token is expired")
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+        }
+
     }
 }
