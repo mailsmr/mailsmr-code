@@ -2,7 +2,7 @@ package io.mailsmr.domain.events
 
 import java.security.Principal
 
-abstract class UserWebSocketPathConnectionEvent(
+abstract class WebSocketUserPathConnectionEvent(
     source: Any,
     val userPrincipal: Principal,
     sessionId: String,

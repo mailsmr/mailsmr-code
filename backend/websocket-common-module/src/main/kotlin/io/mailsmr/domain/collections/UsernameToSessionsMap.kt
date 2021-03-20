@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap
 internal class UsernameToSessionsMap {
     private val usernameToSessionsMap: ConcurrentHashMap<String, MutableSet<String>> = ConcurrentHashMap()
 
+    fun isEmpty() = usernameToSessionsMap.isEmpty()
+
     fun allSessionsForUserAreClosed(user: String): Boolean = getUserSessionsCount(user) == 0
 
     fun mapSessionToUser(sessionId: String, user: String) {
@@ -25,4 +27,7 @@ internal class UsernameToSessionsMap {
 
     private fun getUserSessionsCount(user: String): Int = usernameToSessionsMap[user]?.size ?: 0
 
+    override fun toString(): String {
+        return usernameToSessionsMap.toString()
+    }
 }

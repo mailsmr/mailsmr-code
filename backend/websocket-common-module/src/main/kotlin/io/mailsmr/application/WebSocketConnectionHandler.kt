@@ -1,5 +1,6 @@
 package io.mailsmr.application
 
+import io.mailsmr.application.exceptions.UnauthorizedException
 import io.mailsmr.domain.collections.DestinationToSessionsMap
 import io.mailsmr.domain.collections.SessionToDestinationsMap
 import io.mailsmr.domain.collections.UsernameToDestinationsMap
@@ -15,7 +16,7 @@ import java.security.Principal
 import java.util.function.Consumer
 
 @Service
-internal class WebSocketUserConnectionHandler(
+internal class WebSocketConnectionHandler(
     private val applicationEventPublisher: ApplicationEventPublisher
 
 ) {
@@ -39,23 +40,21 @@ internal class WebSocketUserConnectionHandler(
 
     @EventListener
     fun handleSessionUnsubscribed(event: SessionUnsubscribeEvent) {
-        val destinationPath = event.message.headers["simpDestination"] as String
         val sessionId = event.message.headers["simpSessionId"] as String
-        val userPrincipal = event.user
+        val userPrincipal = event.user ?: event.message.headers["simpUser"] as Principal?
 
-        if (isUserDestination(destinationPath)) {
-            handleUserDestinationSessionDisconnected(sessionId, userPrincipal, destinationPath)
-        } else {
-            handlePublicDestinationSessionDisconnected(sessionId, destinationPath)
-        }
+        handleSessionUnsubscribedOrDisconnected(sessionId, userPrincipal)
     }
-
 
     @EventListener
     fun handleSessionDisconnected(event: SessionDisconnectEvent) {
         val sessionId = event.message.headers["simpSessionId"] as String
-        val userPrincipal = event.user
+        val userPrincipal = event.user ?: event.message.headers["simpUser"] as Principal?
 
+        handleSessionUnsubscribedOrDisconnected(sessionId, userPrincipal)
+    }
+
+    private fun handleSessionUnsubscribedOrDisconnected(sessionId: String, userPrincipal: Principal?) {
         if (userPrincipal != null) {
             handleUserSessionDisconnected(sessionId, userPrincipal)
         }
@@ -64,23 +63,25 @@ internal class WebSocketUserConnectionHandler(
 
     private fun isUserDestination(destinationPath: String) = destinationPath.startsWith("/user")
 
-
     private fun handleUserDestinationSubscribed(event: SessionSubscribeEvent) {
         val sessionId = event.message.headers["simpSessionId"] as String
         val destinationPath = event.message.headers["simpDestination"] as String
-        val userPrincipal = event.user ?: throw Exception("User principal is not set - user is not authenticated!")
+        val userPrincipal = event.user
+            ?: event.message.headers["simpUser"] as Principal?
+            ?: throw UnauthorizedException("User principal is not set - user is not authenticated!")
+
 
         val username = userPrincipal.name
 
         usernameToSessionsMap.mapSessionToUser(sessionId, username)
 
-        if (usernameToUserDestinationsMap.isNewDestinationForUser(username, destinationPath)) {
-            val wsEvent = UserWebSocketNewPathConnectionEvent(this, userPrincipal, sessionId, destinationPath)
+        if (usernameToUserDestinationsMap.isNewDestinationForUser(destinationPath, username)) {
+            val wsEvent = WebSocketNewUserPathConnectionEvent(this, userPrincipal, sessionId, destinationPath)
             applicationEventPublisher.publishEvent(wsEvent)
-            usernameToUserDestinationsMap.mapDestinationToUser(username, destinationPath)
+            usernameToUserDestinationsMap.mapDestinationToUser(destinationPath, username)
         } else {
             val wsEvent =
-                UserWebSocketExistingPathConnectionEvent(this, userPrincipal, sessionId, destinationPath)
+                WebSocketExistingUserPathConnectionEvent(this, userPrincipal, sessionId, destinationPath)
             applicationEventPublisher.publishEvent(wsEvent)
         }
     }
@@ -94,36 +95,19 @@ internal class WebSocketUserConnectionHandler(
         } else {
             WebSocketExistingPathConnectionEvent(this, sessionId, destinationPath)
         }
-        publicDestinationToSessionsMap.mapSessionToDestination(destinationPath, sessionId)
-        sessionToPublicDestinationsMap.mapDestinationToSession(sessionId, destinationPath)
+        publicDestinationToSessionsMap.mapSessionToDestination(sessionId, destinationPath)
+        sessionToPublicDestinationsMap.mapDestinationToSession(destinationPath, sessionId)
         applicationEventPublisher.publishEvent(wsEvent)
     }
 
-    private fun handleUserDestinationSessionDisconnected(
-        sessionId: String,
-        userPrincipal: Principal?,
-        destinationPath: String
-    ) {
-        if (userPrincipal == null) throw Exception("User principal is not set - user is not authenticated!")
-
-        val username = userPrincipal.name
-
-        usernameToSessionsMap.unmapSessionFromUser(sessionId, username)
-
-        if (usernameToSessionsMap.allSessionsForUserAreClosed(username)) {
-            val wsEvent = UserWebSocketPathConnectionClosedEvent(this, userPrincipal, sessionId, destinationPath)
-            applicationEventPublisher.publishEvent(wsEvent)
-        }
-    }
-
     private fun handlePublicSessionDisconnected(sessionId: String) {
-        sessionToPublicDestinationsMap.clearSession(sessionId)?.forEach(Consumer { destination ->
+        sessionToPublicDestinationsMap.clearSessionAndReturnDestinations(sessionId).forEach(Consumer { destination ->
             handlePublicDestinationSessionDisconnected(sessionId, destination)
         })
     }
 
     private fun handlePublicDestinationSessionDisconnected(sessionId: String, destinationPath: String) {
-        publicDestinationToSessionsMap.unmapSessionFromDestination(destinationPath, sessionId)
+        publicDestinationToSessionsMap.unmapSessionFromDestination(sessionId, destinationPath)
 
         if (publicDestinationToSessionsMap.allSessionsForDestinationAreClosed(destinationPath)) {
             val wsEvent = WebSocketPathConnectionClosedEvent(this, sessionId, destinationPath)
@@ -139,11 +123,10 @@ internal class WebSocketUserConnectionHandler(
 
         usernameToSessionsMap.unmapSessionFromUser(sessionId, username)
         if (usernameToSessionsMap.allSessionsForUserAreClosed(username)) {
-            usernameToUserDestinationsMap.clearUser(username)?.forEach(Consumer { destination ->
-                val wsEvent = UserWebSocketPathConnectionClosedEvent(this, userPrincipal, sessionId, destination)
+            usernameToUserDestinationsMap.clearUserAndReturnDestinations(username).forEach(Consumer { destination ->
+                val wsEvent = WebSocketUserPathConnectionClosedEvent(this, userPrincipal, sessionId, destination)
                 applicationEventPublisher.publishEvent(wsEvent)
             })
         }
     }
-
 }

@@ -130,9 +130,3 @@ subprojects {
         }
     }
 }
-// TODO remove if not needed in future
-//configurations {
-//    compileOnly {
-//        extendsFrom(configurations.annotationProcessor.get())
-//    }
-//}

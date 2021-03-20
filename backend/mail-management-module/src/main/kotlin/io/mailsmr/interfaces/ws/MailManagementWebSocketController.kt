@@ -1,9 +1,9 @@
 package io.mailsmr.interfaces.ws
 
 import io.mailsmr.application.WebSocketMessagingHelper
-import io.mailsmr.domain.events.UserWebSocketExistingPathConnectionEvent
-import io.mailsmr.domain.events.UserWebSocketPathConnectionClosedEvent
-import io.mailsmr.domain.events.UserWebSocketNewPathConnectionEvent
+import io.mailsmr.domain.events.WebSocketExistingUserPathConnectionEvent
+import io.mailsmr.domain.events.WebSocketUserPathConnectionClosedEvent
+import io.mailsmr.domain.events.WebSocketNewUserPathConnectionEvent
 import io.mailsmr.interfaces.ws.dtos.WebSocketEmailsResponseDto
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.Message
@@ -32,7 +32,7 @@ class MailManagementWebSocketController(
     }
 
     @EventListener
-    fun handleUserMessagesNewConnection(event: UserWebSocketNewPathConnectionEvent) { // TODO rename
+    fun handleUserMessagesNewConnection(event: WebSocketNewUserPathConnectionEvent) { // TODO rename
         if (event.simpPath != "/user/queue/messages") return
 
         println("=== OPEN CONNECTION AND SEND DATA (U): " + event.simpPath)
@@ -52,7 +52,7 @@ class MailManagementWebSocketController(
 
 
     @EventListener
-    fun handleUserMessagesConnection(event: UserWebSocketExistingPathConnectionEvent) { // TODO rename
+    fun handleUserMessagesConnection(event: WebSocketExistingUserPathConnectionEvent) { // TODO rename
         if (event.simpPath != "/user/queue/messages") return
 
         println("=== RESEND DATA: " + event.simpPath)
@@ -71,7 +71,7 @@ class MailManagementWebSocketController(
     }
 
     @EventListener
-    fun handleUserMessagesConnection(event: UserWebSocketPathConnectionClosedEvent) { // TODO rename
+    fun handleUserMessagesConnection(event: WebSocketUserPathConnectionClosedEvent) { // TODO rename
         if (event.simpPath != "/user/queue/messages") return
 
         println("=== CLOSE CONNECTION: " + event.simpPath)

@@ -2,9 +2,9 @@ package io.mailsmr.domain.events
 
 import java.security.Principal
 
-class UserWebSocketPathConnectionClosedEvent(
+class WebSocketExistingUserPathConnectionEvent(
     source: Any,
     userPrincipal: Principal,
     sessionId: String,
     simpPath: String,
-) : UserWebSocketPathConnectionEvent(source, userPrincipal, sessionId, simpPath)
+) : WebSocketUserPathConnectionEvent(source, userPrincipal, sessionId, simpPath)

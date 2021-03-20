@@ -5,15 +5,21 @@ import java.util.concurrent.ConcurrentHashMap
 internal class UsernameToDestinationsMap {
     private val usernameToDestinationsMap: ConcurrentHashMap<String, MutableSet<String>> = ConcurrentHashMap()
 
-    fun clearUser(username: String) = usernameToDestinationsMap.remove(username)
+    fun isEmpty() = usernameToDestinationsMap.isEmpty()
 
-    fun isNewDestinationForUser(username: String, destination: String): Boolean {
+    fun clearUserAndReturnDestinations(username: String) = usernameToDestinationsMap.remove(username) ?: HashSet()
+
+    fun isNewDestinationForUser(destination: String, username: String): Boolean {
         return !getPathsForUser(username).contains(destination)
     }
 
-    fun mapDestinationToUser(username: String, destination: String) {
+    fun mapDestinationToUser(destination: String, username: String) {
         usernameToDestinationsMap.computeIfAbsent(username) { HashSet() }.add(destination)
     }
 
     private fun getPathsForUser(username: String) = usernameToDestinationsMap[username] ?: HashSet()
+
+    override fun toString(): String {
+        return usernameToDestinationsMap.toString()
+    }
 }

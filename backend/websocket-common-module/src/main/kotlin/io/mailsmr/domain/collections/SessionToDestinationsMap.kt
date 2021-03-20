@@ -5,9 +5,15 @@ import java.util.concurrent.ConcurrentHashMap
 internal class SessionToDestinationsMap {
     private val usernameToDestinationsMap: ConcurrentHashMap<String, MutableSet<String>> = ConcurrentHashMap()
 
-    fun clearSession(sessionId: String) = usernameToDestinationsMap.remove(sessionId)
+    fun isEmpty() = usernameToDestinationsMap.isEmpty()
 
-    fun mapDestinationToSession(sessionId: String, destination: String) {
+    fun clearSessionAndReturnDestinations(sessionId: String) = usernameToDestinationsMap.remove(sessionId) ?: HashSet()
+
+    fun mapDestinationToSession(destination: String, sessionId: String) {
         usernameToDestinationsMap.computeIfAbsent(sessionId) { HashSet() }.add(destination)
+    }
+
+    override fun toString(): String {
+        return usernameToDestinationsMap.toString()
     }
 }
