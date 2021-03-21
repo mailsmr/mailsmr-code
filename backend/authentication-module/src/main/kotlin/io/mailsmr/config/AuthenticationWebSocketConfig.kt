@@ -12,12 +12,10 @@ import org.springframework.messaging.simp.stomp.StompCommand
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.messaging.support.MessageHeaderAccessor
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
 
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE + 99) // interceptor config must be before spring security
-@EnableWebSocketMessageBroker
 class AuthenticationWebSocketConfig(
     private val authenticationUserDetailsService: AuthenticationUserDetailsService,
     private val jwtTokenFactory: JwtTokenFactory

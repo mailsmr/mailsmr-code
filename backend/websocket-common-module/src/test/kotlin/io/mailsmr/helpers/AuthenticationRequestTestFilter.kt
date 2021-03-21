@@ -1,4 +1,4 @@
-package io.mailsmr.authentication_helpers
+package io.mailsmr.helpers
 
 import org.springframework.boot.test.context.TestComponent
 import org.springframework.messaging.simp.stomp.StompHeaders

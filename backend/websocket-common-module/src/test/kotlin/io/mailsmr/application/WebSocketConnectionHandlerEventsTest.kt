@@ -1,7 +1,7 @@
 package io.mailsmr.application
 
 import io.mailsmr.application.exceptions.UnauthorizedException
-import io.mailsmr.authentication_helpers.AuthenticationTokenCreator
+import io.mailsmr.helpers.AuthenticationTokenCreator
 import io.mailsmr.domain.events.WebSocketNewPathConnectionEvent
 import io.mailsmr.domain.events.WebSocketNewUserPathConnectionEvent
 import io.mailsmr.domain.events.WebSocketPathConnectionClosedEvent
@@ -49,7 +49,7 @@ internal class WebSocketConnectionHandlerEventsTest {
 
 
     @Test
-    fun handleSessionSubscribed_shouldTrigger_WebSocketNewPathConnectionEvent_ifUnauthorized_forPublicUrl() {
+    fun handleSessionSubscribed_shouldTrigger_WebSocketNewPathConnectionEvent_ifNotAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -78,7 +78,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionSubscribed_shouldTrigger_WebSocketNewPathConnectionEvent_ifAuthorized_forPublicUrl() {
+    fun handleSessionSubscribed_shouldTrigger_WebSocketNewPathConnectionEvent_ifAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -110,7 +110,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionSubscribed_shouldThrow_ifUnauthorized_forUserUrl() {
+    fun handleSessionSubscribed_shouldThrow_ifNotAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -140,7 +140,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionSubscribed_shouldTrigger_WebSocketNewUserPathConnectionEvent_ifAuthorized_forUserUrl() {
+    fun handleSessionSubscribed_shouldTrigger_WebSocketNewUserPathConnectionEvent_ifAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -173,7 +173,7 @@ internal class WebSocketConnectionHandlerEventsTest {
 
 
     @Test
-    fun handleSessionUnsubscribed_shouldTrigger_WebSocketPathConnectionClosedEvent_ifUnauthorized_forPublicUrl() {
+    fun handleSessionUnsubscribed_shouldTrigger_WebSocketPathConnectionClosedEvent_ifNotAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -214,7 +214,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionUnsubscribed_shouldTrigger_WebSocketPathConnectionClosedEvent_ifAuthorized_forPublicUrl() {
+    fun handleSessionUnsubscribed_shouldTrigger_WebSocketPathConnectionClosedEvent_ifAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -261,7 +261,7 @@ internal class WebSocketConnectionHandlerEventsTest {
 
 
     @Test
-    fun handleSessionUnsubscribed_shouldNotTrigger_WebSocketUserPathConnectionClosedEvent_ifUnauthorized_forUserUrl() {
+    fun handleSessionUnsubscribed_shouldNotTrigger_WebSocketUserPathConnectionClosedEvent_ifNotAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -305,7 +305,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionUnsubscribed_shouldTrigger_WebSocketUserPathConnectionClosedEvent_ifAuthorized_forUserUrl() {
+    fun handleSessionUnsubscribed_shouldTrigger_WebSocketUserPathConnectionClosedEvent_ifAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -351,7 +351,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_ifUnauthorized_forPublicUrl() {
+    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_ifNotAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -395,7 +395,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_ifAuthorized_forPublicUrl() {
+    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_ifAuthenticated_forPublicUrl() {
         // arrange
         val destinationPath = "/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -445,7 +445,7 @@ internal class WebSocketConnectionHandlerEventsTest {
 
 
     @Test
-    fun handleSessionDisconnected_shouldNotTrigger_WebSocketUserPathConnectionClosedEvent_ifUnauthorized_forUserUrl() {
+    fun handleSessionDisconnected_shouldNotTrigger_WebSocketUserPathConnectionClosedEvent_ifNotAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -492,7 +492,7 @@ internal class WebSocketConnectionHandlerEventsTest {
     }
 
     @Test
-    fun handleSessionDisconnected_shouldTrigger_WebSocketUserPathConnectionClosedEvent_ifAuthorized_forUserUrl() {
+    fun handleSessionDisconnected_shouldTrigger_WebSocketUserPathConnectionClosedEvent_ifAuthenticated_forUserUrl() {
         // arrange
         val destinationPath = "/user/topic/anything"
         val sessionId = "123456-123-123-123"
@@ -542,7 +542,7 @@ internal class WebSocketConnectionHandlerEventsTest {
 
 
     @Test
-    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_3Times_ifUnauthorized_for3PublicUrl() {
+    fun handleSessionDisconnected_shouldTrigger_WebSocketPathConnectionClosedEvent_3Times_ifNotAuthenticated_for3PublicUrl() {
         // arrange
         val destinationPath1 = "/topic/anything1"
         val destinationPath2 = "/topic/anything2"

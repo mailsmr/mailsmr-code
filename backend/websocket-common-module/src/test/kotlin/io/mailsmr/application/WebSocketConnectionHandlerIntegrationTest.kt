@@ -6,8 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
-import io.mailsmr.authentication_helpers.AuthenticationRequestTestFilter
-import io.mailsmr.authentication_helpers.AuthenticationRequestTestFilter.Companion.authenticatedStompHeaders
+import io.mailsmr.helpers.AuthenticationRequestTestFilter
+import io.mailsmr.helpers.AuthenticationRequestTestFilter.Companion.authenticatedStompHeaders
 import io.mailsmr.domain.collections.DestinationToSessionsMap
 import io.mailsmr.domain.collections.SessionToDestinationsMap
 import io.mailsmr.domain.collections.UsernameToDestinationsMap
@@ -59,8 +59,6 @@ internal class WebSocketConnectionHandlerIntegrationTest {
 
     private var session: StompSession? = null
 
-    private var subscptions: MutableList<StompSession.Subscription> = mutableListOf()
-
     @TestConfiguration
     @Order(Ordered.HIGHEST_PRECEDENCE + 99)
     class WebSecurityConfig : WebSecurityConfigurerAdapter() {
@@ -95,8 +93,6 @@ internal class WebSocketConnectionHandlerIntegrationTest {
                 }
             })
             .get(1, TimeUnit.SECONDS)
-
-        subscptions = mutableListOf()
     }
 
     @AfterEach

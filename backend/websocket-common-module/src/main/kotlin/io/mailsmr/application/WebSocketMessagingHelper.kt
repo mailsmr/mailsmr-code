@@ -14,7 +14,7 @@ class WebSocketMessagingHelper(
     }
 
     fun convertAndSendToSession(sessionId: String, destination: String, payload: Any) {
-        val sanitizedDestination = destination.removePrefix("/user")
+        val sanitizedDestination = destination.removePrefix(messagingTemplate.userDestinationPrefix)
 
         if (!sessionId.matches(SESSION_ID_REGEX)) throw IllegalArgumentException("Provided session id is not valid: $sessionId")
 
@@ -31,9 +31,9 @@ class WebSocketMessagingHelper(
     }
 
     fun convertAndSendToUser(username: String, destination: String, payload: Any) {
-        val sanitizedDestination = destination.removePrefix("/user")
+        val sanitizedDestination = destination.removePrefix(messagingTemplate.userDestinationPrefix)
 
-        if (username.matches(SESSION_ID_REGEX)) throw IllegalArgumentException("Provided username is a session id: $username")
+        if (username.matches(SESSION_ID_REGEX)) throw IllegalArgumentException("Provided username is a session id: $username - use convertAndSendToSession")
 
 
         messagingTemplate.convertAndSendToUser(

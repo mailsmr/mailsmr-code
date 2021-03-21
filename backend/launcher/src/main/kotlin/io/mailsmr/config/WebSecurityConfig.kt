@@ -21,7 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 internal class WebSecurityConfig(

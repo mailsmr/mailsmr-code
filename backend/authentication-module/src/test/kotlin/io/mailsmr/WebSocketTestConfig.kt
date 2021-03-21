@@ -1,4 +1,4 @@
-package io.mailsmr.authentication_helpers
+package io.mailsmr
 
 import io.mailsmr.interfaces.ws.WebSocketErrorHandler
 import org.springframework.context.annotation.Configuration
