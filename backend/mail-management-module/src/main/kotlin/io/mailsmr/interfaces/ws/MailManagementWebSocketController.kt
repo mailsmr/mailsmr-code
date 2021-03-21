@@ -2,8 +2,8 @@ package io.mailsmr.interfaces.ws
 
 import io.mailsmr.application.WebSocketMessagingHelper
 import io.mailsmr.domain.events.WebSocketExistingUserPathConnectionEvent
-import io.mailsmr.domain.events.WebSocketUserPathConnectionClosedEvent
 import io.mailsmr.domain.events.WebSocketNewUserPathConnectionEvent
+import io.mailsmr.domain.events.WebSocketUserPathConnectionClosedEvent
 import io.mailsmr.interfaces.ws.dtos.WebSocketEmailsResponseDto
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.Message

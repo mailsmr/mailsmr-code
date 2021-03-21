@@ -1,8 +1,8 @@
 package io.mailsmr.application
 
-import io.mailsmr.errors.InvalidPasswordException
 import io.mailsmr.common.infrastructure.entities.User
 import io.mailsmr.common.infrastructure.repositories.UserRepository
+import io.mailsmr.errors.InvalidPasswordException
 import io.mailsmr.interfaces.rest.dtos.PatchUserRequestDto
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.dao.DuplicateKeyException
@@ -38,10 +38,10 @@ class UserService(
 
 
         val user = User(
-                username = username,
-                recoveryEmailAddress = recoveryEmailAddress,
-                passwordHashWithSalt = passwordHashWithSalt,
-                masterKeyEncryptionSecret = masterKeyEncryptionSecret
+            username = username,
+            recoveryEmailAddress = recoveryEmailAddress,
+            passwordHashWithSalt = passwordHashWithSalt,
+            masterKeyEncryptionSecret = masterKeyEncryptionSecret
         )
 
         userRepository.saveAndFlush(user)

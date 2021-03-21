@@ -6,13 +6,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
-import io.mailsmr.helpers.AuthenticationRequestTestFilter
-import io.mailsmr.helpers.AuthenticationRequestTestFilter.Companion.authenticatedStompHeaders
 import io.mailsmr.domain.collections.DestinationToSessionsMap
 import io.mailsmr.domain.collections.SessionToDestinationsMap
 import io.mailsmr.domain.collections.UsernameToDestinationsMap
 import io.mailsmr.domain.collections.UsernameToSessionsMap
 import io.mailsmr.domain.events.*
+import io.mailsmr.helpers.AuthenticationRequestTestFilter
+import io.mailsmr.helpers.AuthenticationRequestTestFilter.Companion.authenticatedStompHeaders
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

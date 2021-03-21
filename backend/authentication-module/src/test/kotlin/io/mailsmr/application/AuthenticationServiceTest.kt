@@ -7,7 +7,6 @@ import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
 import io.mailsmr.domain.errors.InvalidCredentialsException
 import io.mailsmr.domain.errors.InvalidTokenException
 import io.mailsmr.domain.errors.UnauthorizedTokenCombinationException
-import io.mailsmr.application.UserService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

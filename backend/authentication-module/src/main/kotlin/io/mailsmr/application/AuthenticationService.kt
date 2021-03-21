@@ -12,7 +12,6 @@ import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
 import io.mailsmr.domain.errors.InvalidCredentialsException
 import io.mailsmr.domain.errors.InvalidTokenException
 import io.mailsmr.domain.errors.UnauthorizedTokenCombinationException
-import io.mailsmr.application.UserService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException

@@ -4,7 +4,6 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
-import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.stereotype.Service
 import java.security.InvalidKeyException
 import java.time.Clock

@@ -16,7 +16,10 @@ import javax.servlet.http.HttpServletRequest
 internal class UserApiController(
     private val userService: UserService,
 ) : UserApi {
-    override fun createUser(@RequestBody userDto: NewUserRequestDto, request: HttpServletRequest): ResponseEntity<String> {
+    override fun createUser(
+        @RequestBody userDto: NewUserRequestDto,
+        request: HttpServletRequest
+    ): ResponseEntity<String> {
         val (username, password, recoveryEmailAddress) = userDto
 
         return try {
@@ -41,7 +44,10 @@ internal class UserApiController(
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    override fun patchUser(@RequestBody userDto: PatchUserRequestDto, request: HttpServletRequest): ResponseEntity<UserDto> {
+    override fun patchUser(
+        @RequestBody userDto: PatchUserRequestDto,
+        request: HttpServletRequest
+    ): ResponseEntity<UserDto> {
         val user = userService.getUserFromHttpServletRequest(request)!! // checked by security context
 
         userService.patchUser(user, userDto)

@@ -4,11 +4,11 @@ import io.mailsmr.interfaces.rest.AuthenticationApiPaths.AUTHENTICATION_BASE_PAT
 import io.mailsmr.interfaces.rest.AuthenticationApiPaths.GET__LIST_GRANTED_REFRESH_TOKENS
 import io.mailsmr.interfaces.rest.AuthenticationApiPaths.POST__CREATE_AUTHENTICATION_TOKEN_PATH
 import io.mailsmr.interfaces.rest.AuthenticationApiPaths.POST__USE_REFRESH_TOKEN_PATH
+import io.mailsmr.interfaces.rest.constants.OpenApiConfigConstants.SECURITY_SCHEME_NAME
 import io.mailsmr.interfaces.rest.dtos.AuthenticationResponseDto
 import io.mailsmr.interfaces.rest.dtos.AuthenticationTokenRefreshRequestDto
 import io.mailsmr.interfaces.rest.dtos.AuthenticationTokenRequestDto
 import io.mailsmr.interfaces.rest.dtos.GrantedRefreshTokenDTO
-import io.mailsmr.interfaces.rest.constants.OpenApiConfigConstants.SECURITY_SCHEME_NAME
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag

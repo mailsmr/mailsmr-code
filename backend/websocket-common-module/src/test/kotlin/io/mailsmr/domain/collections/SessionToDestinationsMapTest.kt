@@ -3,8 +3,6 @@ package io.mailsmr.domain.collections
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.test.util.ReflectionTestUtils
-import java.util.concurrent.ConcurrentHashMap
 
 internal class SessionToDestinationsMapTest {
     private lateinit var sessionToDestinationsMap: SessionToDestinationsMap

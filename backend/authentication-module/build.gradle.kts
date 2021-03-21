@@ -13,7 +13,7 @@ dependencies {
 
     //  - SECURITY
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation(group = "org.springframework.security", name = "spring-security-messaging", version= "5.4.5")
+    implementation(group = "org.springframework.security", name = "spring-security-messaging", version = "5.4.5")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("com.github.ulisesbocchio:jasypt-maven-plugin:3.0.2")
 

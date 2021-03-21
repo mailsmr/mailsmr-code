@@ -1,11 +1,11 @@
 package io.mailsmr.application
 
 import io.mailsmr.application.exceptions.UnauthorizedException
-import io.mailsmr.helpers.AuthenticationTokenCreator
 import io.mailsmr.domain.events.WebSocketNewPathConnectionEvent
 import io.mailsmr.domain.events.WebSocketNewUserPathConnectionEvent
 import io.mailsmr.domain.events.WebSocketPathConnectionClosedEvent
 import io.mailsmr.domain.events.WebSocketUserPathConnectionClosedEvent
+import io.mailsmr.helpers.AuthenticationTokenCreator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

@@ -1,8 +1,8 @@
 package io.mailsmr.helpers
 
 import io.mailsmr.application.AuthenticationService
-import io.mailsmr.interfaces.rest.dtos.AuthenticationResponseDto
 import io.mailsmr.application.UserService
+import io.mailsmr.interfaces.rest.dtos.AuthenticationResponseDto
 import org.springframework.stereotype.Service
 
 @Service

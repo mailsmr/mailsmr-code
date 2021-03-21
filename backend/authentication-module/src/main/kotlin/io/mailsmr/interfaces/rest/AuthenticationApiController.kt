@@ -33,7 +33,10 @@ internal class AuthenticationApiController(
         request: HttpServletRequest
     ): ResponseEntity<AuthenticationResponseDto> {
         val (previousAccessToken, currentRefreshToken) = authenticationTokenRefreshBearerDto
-        val (newAccessToken, newRefreshToken) = authenticationService.useRefreshTokenAndGenerateNewJwtTokenPair(previousAccessToken, currentRefreshToken)
+        val (newAccessToken, newRefreshToken) = authenticationService.useRefreshTokenAndGenerateNewJwtTokenPair(
+            previousAccessToken,
+            currentRefreshToken
+        )
 
         val authenticationResponseDto = AuthenticationResponseDto(newAccessToken.toString(), newRefreshToken.toString())
 

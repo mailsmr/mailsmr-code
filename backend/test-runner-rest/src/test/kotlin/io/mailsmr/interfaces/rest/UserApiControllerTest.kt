@@ -1,5 +1,6 @@
 package io.mailsmr.interfaces.rest
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mailsmr.helpers.RestTestSessionHelper
 import io.mailsmr.interfaces.rest.UserApiPaths.DELETE__DELETE_USER_PATH
 import io.mailsmr.interfaces.rest.UserApiPaths.GET__GET_USER_PATH
@@ -9,7 +10,6 @@ import io.mailsmr.interfaces.rest.UserApiPaths.USER_BASE_PATH
 import io.mailsmr.interfaces.rest.dtos.NewUserRequestDto
 import io.mailsmr.interfaces.rest.dtos.PatchUserRequestDto
 import io.mailsmr.interfaces.rest.dtos.UserDto
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

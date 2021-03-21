@@ -2,7 +2,6 @@ package io.mailsmr.domain.errors
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.lang.RuntimeException
 
 /**
  * Returning Error with HTTP Status HttpStatus.UNPROCESSABLE_ENTITY - 422
@@ -18,5 +17,10 @@ class InvalidTokenException : RuntimeException {
 
     constructor(cause: Throwable?) : super(cause)
 
-    constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
+    constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(
+        message,
+        cause,
+        enableSuppression,
+        writableStackTrace
+    )
 }

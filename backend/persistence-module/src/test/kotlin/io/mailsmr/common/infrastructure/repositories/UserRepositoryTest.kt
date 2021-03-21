@@ -14,21 +14,21 @@ internal class UserRepositoryTest {
     @Autowired
     private lateinit var userRepository: UserRepository
 
-   @Test
-   fun findByUsername_shouldFindUser_ifExists() {
-       // arrange
-       val username = "TestUser"
-       val user = User(
-           username, "test@test.com", "passwordWithHash", "masterSecret"
-       )
-       userRepository.saveAndFlush(user)
+    @Test
+    fun findByUsername_shouldFindUser_ifExists() {
+        // arrange
+        val username = "TestUser"
+        val user = User(
+            username, "test@test.com", "passwordWithHash", "masterSecret"
+        )
+        userRepository.saveAndFlush(user)
 
-       // act
-       val foundUser = userRepository.findByUsername(username)
+        // act
+        val foundUser = userRepository.findByUsername(username)
 
-       // assert
-       assertEquals(user, foundUser)
-   }
+        // assert
+        assertEquals(user, foundUser)
+    }
 
     @Test
     fun findByUsername_shouldReturnNull_asItShouldBeCaseSensitive() {

@@ -9,7 +9,7 @@ tasks.register("testJar", Jar::class.java) {
 }
 
 artifacts {
-    add("testResourceArtifacts", tasks.named<Jar>("testJar") )
+    add("testResourceArtifacts", tasks.named<Jar>("testJar"))
 }
 
 dependencies {

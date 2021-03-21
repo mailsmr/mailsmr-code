@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 internal class MailSMRBackendApplication
 
 fun main(args: Array<String>) {
-	runApplication<MailSMRBackendApplication>(*args)
+    runApplication<MailSMRBackendApplication>(*args)
 }

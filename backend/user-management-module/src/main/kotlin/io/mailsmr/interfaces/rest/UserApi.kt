@@ -1,11 +1,11 @@
 package io.mailsmr.interfaces.rest
 
-import io.mailsmr.interfaces.rest.constants.OpenApiConfigConstants.SECURITY_SCHEME_NAME
 import io.mailsmr.interfaces.rest.UserApiPaths.DELETE__DELETE_USER_PATH
 import io.mailsmr.interfaces.rest.UserApiPaths.GET__GET_USER_PATH
 import io.mailsmr.interfaces.rest.UserApiPaths.PATCH__PATCH_USER_PATH
 import io.mailsmr.interfaces.rest.UserApiPaths.POST__CREATE_USER_PATH
 import io.mailsmr.interfaces.rest.UserApiPaths.USER_BASE_PATH
+import io.mailsmr.interfaces.rest.constants.OpenApiConfigConstants.SECURITY_SCHEME_NAME
 import io.mailsmr.interfaces.rest.dtos.NewUserRequestDto
 import io.mailsmr.interfaces.rest.dtos.PatchUserRequestDto
 import io.mailsmr.interfaces.rest.dtos.UserDto

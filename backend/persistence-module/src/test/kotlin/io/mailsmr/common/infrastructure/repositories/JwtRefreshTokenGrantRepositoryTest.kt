@@ -32,26 +32,26 @@ internal class JwtRefreshTokenGrantRepositoryTest {
         entityManager.flush()
     }
 
-   @Test
-   fun findByUsername_shouldFindGrant_ifExists() {
-       // arrange
-       val jti = "0a0a0a0a-1b1b-2c2c-3d3d-4e4e4e4e4e4e"
-       val jwtRefreshTokenGrant = JwtRefreshTokenGrant(
-           jti,
-           null,
-           LocalDateTime.now().plusDays(30),
-           LocalDateTime.now(),
-           testUser
-       )
+    @Test
+    fun findByUsername_shouldFindGrant_ifExists() {
+        // arrange
+        val jti = "0a0a0a0a-1b1b-2c2c-3d3d-4e4e4e4e4e4e"
+        val jwtRefreshTokenGrant = JwtRefreshTokenGrant(
+            jti,
+            null,
+            LocalDateTime.now().plusDays(30),
+            LocalDateTime.now(),
+            testUser
+        )
 
-       jwtRefreshTokenGrantRepository.saveAndFlush(jwtRefreshTokenGrant)
+        jwtRefreshTokenGrantRepository.saveAndFlush(jwtRefreshTokenGrant)
 
-       // act
-       val foundGrant = jwtRefreshTokenGrantRepository.findByJti(jti)
+        // act
+        val foundGrant = jwtRefreshTokenGrantRepository.findByJti(jti)
 
-       // assert
-       assertEquals(jwtRefreshTokenGrant, foundGrant)
-   }
+        // assert
+        assertEquals(jwtRefreshTokenGrant, foundGrant)
+    }
 
     @Test
     fun findByUsername_shouldReturnNull_ifNotFound() {
@@ -261,7 +261,6 @@ internal class JwtRefreshTokenGrantRepositoryTest {
         // assert
         assertTrue(allByUser.isEmpty())
     }
-
 
 
 }

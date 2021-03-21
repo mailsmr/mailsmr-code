@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.test.util.ReflectionTestUtils
-import java.util.concurrent.ConcurrentHashMap
 
 internal class DestinationToSessionsMapTest {
     private lateinit var destinationToSessionsMap: DestinationToSessionsMap
@@ -30,7 +28,7 @@ internal class DestinationToSessionsMapTest {
     }
 
     @Test
-    fun unmapSessionFromDestination_shouldCreateNewEntryInMap(){
+    fun unmapSessionFromDestination_shouldCreateNewEntryInMap() {
         // arrange
         val sessionId = "sessionId-123"
         val destination = "/topic/anything"
@@ -61,7 +59,7 @@ internal class DestinationToSessionsMapTest {
     }
 
     @Test
-    fun unmapSessionFromDestination_shouldDeleteDestinationsWithNoSessions(){
+    fun unmapSessionFromDestination_shouldDeleteDestinationsWithNoSessions() {
         // arrange
         val sessionId = "sessionId-123"
         val destination = "/topic/anything"

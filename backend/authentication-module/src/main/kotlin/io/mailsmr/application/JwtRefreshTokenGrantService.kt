@@ -1,11 +1,11 @@
 package io.mailsmr.application
 
-import io.mailsmr.domain.JwtRefreshToken
-import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
-import io.mailsmr.domain.errors.InvalidTokenException
 import io.mailsmr.common.infrastructure.entities.JwtRefreshTokenGrant
 import io.mailsmr.common.infrastructure.entities.User
 import io.mailsmr.common.infrastructure.repositories.JwtRefreshTokenGrantRepository
+import io.mailsmr.domain.JwtRefreshToken
+import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
+import io.mailsmr.domain.errors.InvalidTokenException
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.LocalDateTime
