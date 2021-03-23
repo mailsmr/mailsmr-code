@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 internal class WebSocketMessagingHelperTest {
 
     @LocalServerPort
-    private lateinit var port: Integer // lateinit needed
+    private var port: Int? = null
 
     @Autowired
     private lateinit var webSocketMessagingHelper: WebSocketMessagingHelper

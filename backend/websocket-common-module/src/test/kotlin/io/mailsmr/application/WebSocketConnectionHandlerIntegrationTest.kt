@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
 internal class WebSocketConnectionHandlerIntegrationTest {
 
     @LocalServerPort
-    private lateinit var port: Integer // lateinit needed
+    private var port: Int? = null
 
     @SpyBean
     private lateinit var testWebSocketControllerSpy: TestWebSocketController
