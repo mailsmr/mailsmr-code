@@ -12,7 +12,7 @@ import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @Service
-class JwtTokenFactory(
+class JwtTokenFactoryService(
     private val clock: Clock
 ) {
     @Value("\${jwt.secret}")

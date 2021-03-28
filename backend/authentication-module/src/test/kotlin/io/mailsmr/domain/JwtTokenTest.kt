@@ -4,6 +4,7 @@ import com.mercateo.test.clock.TestClock
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -31,6 +32,14 @@ internal class JwtTokenTest {
 
     @Autowired
     private lateinit var clock: Clock
+
+    @BeforeEach
+    fun resetClock() {
+        val testClock: TestClock = clock as TestClock
+        val systemDefaultZone = Clock.systemDefaultZone()
+
+        testClock.set(systemDefaultZone.instant())
+    }
 
     @Test
     fun getIssueDate_shouldReturn_theDateOfCreation() {

@@ -11,10 +11,10 @@ import java.time.Duration
 import java.util.*
 
 @SpringBootTest
-internal class JwtTokenFactoryTest {
+internal class JwtTokenFactoryServiceTest {
 
     @Autowired
-    private lateinit var jwtTokenFactory: JwtTokenFactory
+    private lateinit var jwtTokenFactoryService: JwtTokenFactoryService
 
     @Autowired
     private lateinit var clock: Clock
@@ -27,7 +27,7 @@ internal class JwtTokenFactoryTest {
         mockHttpServletRequest.addHeader("Authorization", "Bearer $jwtTokenString")
 
         // act
-        val token = jwtTokenFactory.fromRequest(mockHttpServletRequest)
+        val token = jwtTokenFactoryService.fromRequest(mockHttpServletRequest)
 
         // assert
         assertEquals(jwtTokenString, token.toString())
@@ -39,7 +39,7 @@ internal class JwtTokenFactoryTest {
         val mockHttpServletRequest = MockHttpServletRequest()
 
         // act
-        val token = jwtTokenFactory.fromRequest(mockHttpServletRequest)
+        val token = jwtTokenFactoryService.fromRequest(mockHttpServletRequest)
 
         // assert
         assertNull(token)
@@ -52,7 +52,7 @@ internal class JwtTokenFactoryTest {
         val authorizationHeader = "Bearer $jwtTokenString"
 
         // act
-        val token = jwtTokenFactory.fromAuthorizationHeader(authorizationHeader)
+        val token = jwtTokenFactoryService.fromAuthorizationHeader(authorizationHeader)
 
         // assert
         assertEquals(jwtTokenString, token.toString())
@@ -65,7 +65,7 @@ internal class JwtTokenFactoryTest {
         val authorizationHeader = "Baerer $jwtTokenString" // is Baerer instead of Bearer
 
         // act & assert
-        assertThrows(InvalidKeyException::class.java) { jwtTokenFactory.fromAuthorizationHeader(authorizationHeader) }
+        assertThrows(InvalidKeyException::class.java) { jwtTokenFactoryService.fromAuthorizationHeader(authorizationHeader) }
     }
 
     @Test
@@ -74,7 +74,7 @@ internal class JwtTokenFactoryTest {
         val jwtTokenString = "TEST_JWT_TOKEN"
 
         // act
-        val token = jwtTokenFactory.fromRefreshTokenString(jwtTokenString)
+        val token = jwtTokenFactoryService.fromRefreshTokenString(jwtTokenString)
 
         // assert
         assertTrue(token is JwtRefreshToken)
@@ -86,7 +86,7 @@ internal class JwtTokenFactoryTest {
         val jwtTokenString = "TEST_JWT_TOKEN"
 
         // act
-        val token = jwtTokenFactory.fromAccessTokenString(jwtTokenString)
+        val token = jwtTokenFactoryService.fromAccessTokenString(jwtTokenString)
 
         // assert
         assertTrue(token is JwtAccessToken)
@@ -99,7 +99,7 @@ internal class JwtTokenFactoryTest {
         val encryptedMasterPassword = "encryptedMasterPassword"
 
         // act
-        val token = jwtTokenFactory.generateAccessToken(username, encryptedMasterPassword)
+        val token = jwtTokenFactoryService.generateAccessToken(username, encryptedMasterPassword)
 
         // assert
         assertTrue(token.isValid())
@@ -110,7 +110,7 @@ internal class JwtTokenFactoryTest {
             token.getIssuedAtDate().toString()
         )
         assertEquals(
-            Date(clock.millis() + JwtTokenFactory.JWT_ACCESS_TOKEN_VALIDITY_DURATION.toMillis()).toString(),
+            Date(clock.millis() + JwtTokenFactoryService.JWT_ACCESS_TOKEN_VALIDITY_DURATION.toMillis()).toString(),
             token.getExpirationDate().toString()
         )
     }
@@ -123,7 +123,7 @@ internal class JwtTokenFactoryTest {
         val expirationDuration = Duration.ofMinutes(5)
 
         // act
-        val token = jwtTokenFactory.generateAccessToken(username, encryptedMasterPassword, expirationDuration)
+        val token = jwtTokenFactoryService.generateAccessToken(username, encryptedMasterPassword, expirationDuration)
 
         // assert
         assertTrue(token.isValid())
@@ -143,7 +143,7 @@ internal class JwtTokenFactoryTest {
         val encryptedMasterPassword = "encryptedMasterPassword"
 
         // act
-        val token = jwtTokenFactory.generateRefreshToken(username)
+        val token = jwtTokenFactoryService.generateRefreshToken(username)
 
         // assert
         assertTrue(token.isValid())
@@ -154,7 +154,7 @@ internal class JwtTokenFactoryTest {
             token.getIssuedAtDate().toString()
         )
         assertEquals(
-            Date(clock.millis() + JwtTokenFactory.JWT_REFRESH_TOKEN_VALIDITY_DURATION.toMillis()).toString(),
+            Date(clock.millis() + JwtTokenFactoryService.JWT_REFRESH_TOKEN_VALIDITY_DURATION.toMillis()).toString(),
             token.getExpirationDate().toString()
         )
     }
@@ -167,7 +167,7 @@ internal class JwtTokenFactoryTest {
         val expirationDuration = Duration.ofMinutes(5)
 
         // act
-        val token = jwtTokenFactory.generateRefreshToken(username, expirationDuration)
+        val token = jwtTokenFactoryService.generateRefreshToken(username, expirationDuration)
 
         // assert
         assertTrue(token.isValid())

@@ -6,7 +6,7 @@ import io.mailsmr.common.infrastructure.entities.User
 import io.mailsmr.common.infrastructure.repositories.UserRepository
 import io.mailsmr.domain.JwtAccessToken
 import io.mailsmr.domain.JwtRefreshToken
-import io.mailsmr.domain.JwtTokenFactory
+import io.mailsmr.domain.JwtTokenFactoryService
 import io.mailsmr.domain.JwtTokenPair
 import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
 import io.mailsmr.domain.errors.InvalidCredentialsException
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 class AuthenticationService(
     private val userRepository: UserRepository,
     private val userService: UserService,
-    private val jwtTokenFactory: JwtTokenFactory,
+    private val jwtTokenFactoryService: JwtTokenFactoryService,
     private val jwtRefreshTokenGrantService: JwtRefreshTokenGrantService,
     private val authenticationManager: AuthenticationManager,
 ) {
@@ -47,8 +47,8 @@ class AuthenticationService(
         previousAccessTokenString: String,
         currentRefreshTokenString: String
     ): JwtTokenPair {
-        val currentRefreshToken: JwtRefreshToken = jwtTokenFactory.fromRefreshTokenString(currentRefreshTokenString)
-        val previousAccessToken: JwtAccessToken = jwtTokenFactory.fromAccessTokenString(previousAccessTokenString)
+        val currentRefreshToken: JwtRefreshToken = jwtTokenFactoryService.fromRefreshTokenString(currentRefreshTokenString)
+        val previousAccessToken: JwtAccessToken = jwtTokenFactoryService.fromAccessTokenString(previousAccessTokenString)
 
         if (currentRefreshToken.isViable() && previousAccessToken.isViable() && currentRefreshToken.isUsernameSet()) {
             matchingTokensCheckBarrier(previousAccessToken, currentRefreshToken)
@@ -83,10 +83,10 @@ class AuthenticationService(
         user: User,
         encryptedMasterPassword: String
     ): JwtTokenPair {
-        val accessToken: JwtAccessToken = jwtTokenFactory.generateAccessToken(
+        val accessToken: JwtAccessToken = jwtTokenFactoryService.generateAccessToken(
             user.username, encryptedMasterPassword
         )
-        val refreshToken: JwtRefreshToken = jwtTokenFactory.generateRefreshToken(user.username)
+        val refreshToken: JwtRefreshToken = jwtTokenFactoryService.generateRefreshToken(user.username)
 
         jwtRefreshTokenGrantService.grantRefreshToken(refreshToken, user)
 

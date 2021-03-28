@@ -1,13 +1,14 @@
 package io.mailsmr.application
 
 import com.mercateo.test.clock.TestClock
-import io.mailsmr.domain.JwtTokenFactory.Companion.JWT_ACCESS_TOKEN_VALIDITY_DURATION
-import io.mailsmr.domain.JwtTokenFactory.Companion.JWT_REFRESH_TOKEN_VALIDITY_DURATION
+import io.mailsmr.domain.JwtTokenFactoryService.Companion.JWT_ACCESS_TOKEN_VALIDITY_DURATION
+import io.mailsmr.domain.JwtTokenFactoryService.Companion.JWT_REFRESH_TOKEN_VALIDITY_DURATION
 import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
 import io.mailsmr.domain.errors.InvalidCredentialsException
 import io.mailsmr.domain.errors.InvalidTokenException
 import io.mailsmr.domain.errors.UnauthorizedTokenCombinationException
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -36,6 +37,14 @@ internal class AuthenticationServiceTest {
 
     @Autowired
     private lateinit var clock: Clock
+
+    @BeforeEach
+    fun resetClock() {
+        val testClock: TestClock = clock as TestClock
+        val systemDefaultZone = Clock.systemDefaultZone()
+
+        testClock.set(systemDefaultZone.instant())
+    }
 
     @Test
     fun authenticateAndCreateJwtTokenPair_shouldCreateJwtTokens_ifUserExistsAndCredentialsAreCorrect() {

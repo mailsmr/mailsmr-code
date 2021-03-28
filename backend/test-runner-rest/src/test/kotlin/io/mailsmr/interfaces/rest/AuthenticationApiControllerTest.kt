@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.type.CollectionType
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.mercateo.test.clock.TestClock
-import io.mailsmr.domain.JwtTokenFactory.Companion.JWT_ACCESS_TOKEN_VALIDITY_DURATION
-import io.mailsmr.domain.JwtTokenFactory.Companion.JWT_REFRESH_TOKEN_VALIDITY_DURATION
+import io.mailsmr.domain.JwtTokenFactoryService.Companion.JWT_ACCESS_TOKEN_VALIDITY_DURATION
+import io.mailsmr.domain.JwtTokenFactoryService.Companion.JWT_REFRESH_TOKEN_VALIDITY_DURATION
 import io.mailsmr.helpers.RestTestSessionHelper
 import io.mailsmr.helpers.RestTestSessionHelper.Companion.PASSWORD
 import io.mailsmr.helpers.RestTestSessionHelper.Companion.USERNAME
@@ -21,6 +21,7 @@ import io.mailsmr.interfaces.rest.dtos.AuthenticationTokenRequestDto
 import io.mailsmr.interfaces.rest.dtos.GrantedRefreshTokenDTO
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -51,7 +52,6 @@ internal class AuthenticationApiControllerTest {
         }
     }
 
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -60,6 +60,14 @@ internal class AuthenticationApiControllerTest {
 
     @Autowired
     private lateinit var clock: Clock
+
+    @BeforeEach
+    fun resetClock() {
+        val testClock: TestClock = clock as TestClock
+        val systemDefaultZone = Clock.systemDefaultZone()
+
+        testClock.set(systemDefaultZone.instant())
+    }
 
     @Test
     fun createAuthenticationToken_shouldReturnNewToken_withValidUsernameAndPassword_200() {

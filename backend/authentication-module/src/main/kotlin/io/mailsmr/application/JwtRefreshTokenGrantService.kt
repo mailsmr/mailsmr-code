@@ -6,6 +6,11 @@ import io.mailsmr.common.infrastructure.repositories.JwtRefreshTokenGrantReposit
 import io.mailsmr.domain.JwtRefreshToken
 import io.mailsmr.domain.errors.ExpiredOrRevokedTokenException
 import io.mailsmr.domain.errors.InvalidTokenException
+import mu.KotlinLogging
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.dao.DuplicateKeyException
+import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.LocalDateTime
@@ -16,7 +21,12 @@ class JwtRefreshTokenGrantService(
     private val jwtRefreshTokenGrantRepository: JwtRefreshTokenGrantRepository,
     private val clock: Clock
 ) {
-//    TODO cron job for removing expired refresh tokens
+    companion object {
+        const val EXPIRED_GRANTS_DELETION_INITIAL_DELAY_IN_MILLIS: Long = 5 * 60 * 1000 // 5 minutes
+        const val EXPIRED_GRANTS_DELETION_INTERVAL_IN_MILLIS: Long = 57 * 60 * 1000 // 57 minutes
+    }
+
+    private val logger = KotlinLogging.logger {}
 
     fun isRefreshTokenGranted(refreshToken: JwtRefreshToken): Boolean {
         if (refreshToken.isViable()) {
@@ -56,7 +66,11 @@ class JwtRefreshTokenGrantService(
                 user = user
             )
 
-            jwtRefreshTokenGrantRepository.saveAndFlush(refreshTokenGrant)
+            try {
+                jwtRefreshTokenGrantRepository.saveAndFlush(refreshTokenGrant)
+            } catch (e: DataIntegrityViolationException){
+                // stub - grant already exists in db
+            }
         } else {
             throw InvalidTokenException()
         }
@@ -66,5 +80,18 @@ class JwtRefreshTokenGrantService(
         return jwtRefreshTokenGrantRepository.findAllByUser(user).parallelStream()
             .filter { token -> token.expirationDateTime.isAfter(LocalDateTime.now(clock)) }
             .collect(Collectors.toList())
+    }
+
+
+    @Async
+    @Scheduled(
+        fixedRate = EXPIRED_GRANTS_DELETION_INTERVAL_IN_MILLIS,
+        initialDelay = EXPIRED_GRANTS_DELETION_INITIAL_DELAY_IN_MILLIS
+    )
+    fun deleteExpiredRefreshTokensFromDatabase() {
+        logger.info("Expired refresh tokens housekeeping started...")
+        jwtRefreshTokenGrantRepository.deleteAllExpired()
+        jwtRefreshTokenGrantRepository.flush()
+        logger.info("Expired refresh tokens housekeeping complete!")
     }
 }

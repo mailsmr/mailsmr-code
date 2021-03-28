@@ -1,7 +1,7 @@
 package io.mailsmr.config
 
 import io.mailsmr.application.AuthenticationUserDetailsService
-import io.mailsmr.domain.JwtTokenFactory
+import io.mailsmr.domain.JwtTokenFactoryService
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -18,7 +18,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Order(Ordered.HIGHEST_PRECEDENCE + 99) // interceptor config must be before spring security
 class AuthenticationWebSocketConfig(
     private val authenticationUserDetailsService: AuthenticationUserDetailsService,
-    private val jwtTokenFactory: JwtTokenFactory
+    private val jwtTokenFactoryService: JwtTokenFactoryService
 ) : WebSocketMessageBrokerConfigurer {
 
     override fun configureClientInboundChannel(registration: ChannelRegistration) {
@@ -40,7 +40,7 @@ class AuthenticationWebSocketConfig(
     }
 
     private fun authenticateUserAndSetPrincipal(accessor: StompHeaderAccessor) {
-        val accessToken = jwtTokenFactory.fromStompHeaderAccessor(accessor)
+        val accessToken = jwtTokenFactoryService.fromStompHeaderAccessor(accessor)
 
         val abstractAuthenticationToken =
             authenticationUserDetailsService.getAuthenticationTokenFromAccessToken(accessToken)

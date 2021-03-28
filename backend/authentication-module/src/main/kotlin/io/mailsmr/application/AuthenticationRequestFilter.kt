@@ -1,6 +1,6 @@
 package io.mailsmr.application
 
-import io.mailsmr.domain.JwtTokenFactory
+import io.mailsmr.domain.JwtTokenFactoryService
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class AuthenticationRequestFilter(
     private val authenticationUserDetailsService: AuthenticationUserDetailsService,
-    private val jwtTokenFactory: JwtTokenFactory
+    private val jwtTokenFactoryService: JwtTokenFactoryService
 ) : OncePerRequestFilter() {
 
 
@@ -22,7 +22,7 @@ class AuthenticationRequestFilter(
     }
 
     private fun setAuthenticationForContext(request: HttpServletRequest) {
-        val accessToken = jwtTokenFactory.fromRequest(request)
+        val accessToken = jwtTokenFactoryService.fromRequest(request)
 
         if (accessToken != null) request.setAttribute("expired", accessToken.isExpired())
 
