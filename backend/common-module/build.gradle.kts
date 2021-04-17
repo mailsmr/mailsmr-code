@@ -15,4 +15,7 @@ artifacts {
 dependencies {
     //  - SECURITY
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    implementation("com.github.ulisesbocchio:jasypt-maven-plugin:3.0.2")
+
 }

@@ -8,6 +8,13 @@ dependencies {
     implementation(project(":persistence-module"))
     implementation(project(":websocket-common-module"))
 
+    // E-Mail
+    implementation("com.sun.mail:jakarta.mail:2.0.1")
+    implementation("jakarta.activation:jakarta.activation-api:2.0.1")
+    implementation("com.google.guava:guava:30.1.1-jre")
+
+    testImplementation("com.icegreen:greenmail-junit5:2.0.0-alpha-1")
+
     // - WEB SOCKET AND MESSAGING
     implementation("org.springframework.boot:spring-boot-starter-websocket")
 

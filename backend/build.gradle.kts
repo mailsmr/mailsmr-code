@@ -97,16 +97,13 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         implementation("io.github.microutils:kotlin-logging:1.12.0")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
-        compileOnly("org.projectlombok:lombok")
 
         //  ===== ANNOTATIONS =====
         annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-        annotationProcessor("org.projectlombok:lombok")
         //  ===== TEST =====
         testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("com.h2database:h2")
-        testImplementation("org.projectlombok:lombok")
         testImplementation("org.mockito:mockito-core:2.+")
         testImplementation("org.mockito:mockito-junit-jupiter:2.18.3")
         testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")

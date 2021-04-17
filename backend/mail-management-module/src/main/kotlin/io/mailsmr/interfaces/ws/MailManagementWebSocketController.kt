@@ -17,8 +17,7 @@ import org.springframework.stereotype.Controller
 
 @Controller
 class MailManagementWebSocketController(
-    private val webSocketMessagingHelper: WebSocketMessagingHelper,
-    private val messagingTemplate: SimpMessagingTemplate
+    private val webSocketMessagingHelper: WebSocketMessagingHelper
 ) {
     @MessageMapping("/hello")
     @SendToUser("/queue/messages")
