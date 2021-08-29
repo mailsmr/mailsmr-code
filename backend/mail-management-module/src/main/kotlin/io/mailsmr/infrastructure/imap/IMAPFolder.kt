@@ -4,32 +4,42 @@ import com.sun.mail.imap.IMAPStore
 import io.mailsmr.infrastructure.enums.FolderOpenMode
 import io.mailsmr.infrastructure.enums.FolderSpecialUse
 import io.mailsmr.infrastructure.enums.MessageCountType
-import io.mailsmr.infrastructure.exceptions.EmailNotFoundException
 import io.mailsmr.infrastructure.exceptions.FolderNotFoundException
 import io.mailsmr.infrastructure.exceptions.MessagingRuntimeException
-import mu.KotlinLogging
+import io.mailsmr.infrastructure.imap.interfaces.MailAccountFolderMessageListener
 import jakarta.mail.FetchProfile
 import jakarta.mail.Flags
 import jakarta.mail.Message
 import jakarta.mail.MessagingException
+import mu.KotlinLogging
 import com.sun.mail.imap.IMAPMessage as NativeIMAPMessage
 
 internal class IMAPFolder(
-    private val nativeImapFolder: com.sun.mail.imap.IMAPFolder,
+    private val nativeImapFolders: IMAPSameFolderPair,
     private val account: IMAPEmailAccount,
-    private val folderSpecialUse: FolderSpecialUse
+    private val folderSpecialUse: FolderSpecialUse,
+    val accountContext: IMAPEmailAccountContext,
 ) : AutoCloseable {
     private val logger = KotlinLogging.logger {}
+
+    private val nativeImapFolder = nativeImapFolders.directAccessFolder
+
+    private var imapEmailFolderNotifier: IMAPEmailFolderNotifier? = null
 
     constructor(
         store: IMAPStore,
         account: IMAPEmailAccount,
         folderName: String?,
-        folderSpecialUse: FolderSpecialUse
+        folderSpecialUse: FolderSpecialUse,
+        accountContext: IMAPEmailAccountContext
     ) : this(
-        store.getFolder(folderName) as com.sun.mail.imap.IMAPFolder,
+        IMAPSameFolderPair(
+            store.getFolder(folderName) as com.sun.mail.imap.IMAPFolder,
+            store.getFolder(folderName) as com.sun.mail.imap.IMAPFolder
+        ),
         account,
-        folderSpecialUse
+        folderSpecialUse,
+        accountContext
     )
 
     fun getMessage(messageNumber: Long): IMAPMessage {
@@ -42,7 +52,6 @@ internal class IMAPFolder(
     fun getMessage(messageNumber: Long, mode: FolderOpenMode): IMAPMessage {
         return try {
             val message = getNativeImapFolder(mode).getMessageByUID(messageNumber) as NativeIMAPMessage
-                ?: throw EmailNotFoundException(messageNumber)
             IMAPMessage.getFromNativeMessage(message)
         } catch (e: MessagingException) {
             throw MessagingRuntimeException(e)
@@ -106,11 +115,25 @@ internal class IMAPFolder(
             getNativeImapFolder(FolderOpenMode.READ_WRITE).expunge() // delete all messages marked as deleted
             return true
         } catch (e: MessagingException) {
-            logger.error(e.message, e)
+            logger.error(e) { e.message }
         } catch (e: FolderNotFoundException) {
-            logger.error(e.message, e)
+            logger.error(e) { e.message }
         }
         return false
+    }
+
+    fun subscribe(listener: MailAccountFolderMessageListener) {
+        if (imapEmailFolderNotifier == null) {
+            imapEmailFolderNotifier = IMAPEmailFolderNotifier(nativeImapFolders.notifierFolder, accountContext)
+        }
+        imapEmailFolderNotifier!!.addMailAccountFolderNewMessageListener(listener)
+    }
+
+
+    fun disconnect(listener: MailAccountFolderMessageListener) {
+        if (imapEmailFolderNotifier != null) {
+            imapEmailFolderNotifier!!.removeMailAccountFolderNewMessageListener(listener)
+        }
     }
 
 
@@ -127,7 +150,7 @@ internal class IMAPFolder(
         }
     }
 
-    private fun getNativeImapFolder(mode: FolderOpenMode): com.sun.mail.imap.IMAPFolder {
+    internal fun getNativeImapFolder(mode: FolderOpenMode): com.sun.mail.imap.IMAPFolder {
         return try {
             if (nativeImapFolder.isOpen) {
                 if (nativeImapFolder.mode != mode.mode) {

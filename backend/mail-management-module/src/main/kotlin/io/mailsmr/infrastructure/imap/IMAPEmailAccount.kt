@@ -2,7 +2,6 @@ package io.mailsmr.infrastructure.imap
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
-import com.sun.mail.imap.IMAPStore
 import io.mailsmr.infrastructure.enums.FolderSpecialUse
 import io.mailsmr.infrastructure.exceptions.FolderNotFoundException
 import io.mailsmr.infrastructure.imap.providers.IMAPEmailAccountGmail
@@ -12,19 +11,26 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors
 
 internal open class IMAPEmailAccount(
-    private val store: IMAPStore,
-    private val specialFoldersBiMap: BiMap<FolderSpecialUse, String>
+    private val accountContext: IMAPEmailAccountContext,
+    private val specialFoldersBiMap: BiMap<FolderSpecialUse, String>,
 ) : AutoCloseable {
     private val logger = KotlinLogging.logger {}
 
+    private val store = accountContext.store
     private val folderMap: ConcurrentHashMap<String, IMAPFolder> = ConcurrentHashMap()
+
 
     fun getFolders(): List<IMAPFolder> {
         return Arrays.stream(store.defaultFolder.list())
             .map { nativeImapFolder ->
                 val folderName = nativeImapFolder.fullName
                 return@map folderMap.computeIfAbsent(folderName) {
-                    return@computeIfAbsent mapAndReturnFolderByNativeFolder(nativeImapFolder as com.sun.mail.imap.IMAPFolder)
+                    return@computeIfAbsent mapAndReturnFolderByNativeFolder(
+                        IMAPSameFolderPair(
+                            nativeImapFolder as com.sun.mail.imap.IMAPFolder,
+                            store.getFolder(folderName) as com.sun.mail.imap.IMAPFolder
+                        )
+                    )
                 }
             }
             .collect(Collectors.toList())
@@ -36,12 +42,13 @@ internal open class IMAPEmailAccount(
         }
     }
 
-    private fun mapAndReturnFolderByNativeFolder(nativeImapFolder: com.sun.mail.imap.IMAPFolder): IMAPFolder {
-        val folderName = nativeImapFolder.fullName
+    private fun mapAndReturnFolderByNativeFolder(nativeImapFolders: IMAPSameFolderPair): IMAPFolder {
+        val folderName = nativeImapFolders.directAccessFolder.fullName
         return IMAPFolder(
-            nativeImapFolder,
+            nativeImapFolders,
             this,
-            specialFoldersBiMap.inverse()[folderName] ?: FolderSpecialUse.NONE
+            specialFoldersBiMap.inverse()[folderName] ?: FolderSpecialUse.NONE,
+            accountContext
         )
     }
 
@@ -50,7 +57,8 @@ internal open class IMAPEmailAccount(
             store,
             this,
             folderName,
-            specialFoldersBiMap.inverse()[folderName] ?: FolderSpecialUse.NONE
+            specialFoldersBiMap.inverse()[folderName] ?: FolderSpecialUse.NONE,
+            accountContext
         )
     }
 
@@ -72,23 +80,22 @@ internal open class IMAPEmailAccount(
     }
 
     companion object {
-        private const val STORE_TYPE = "imaps"
-
-        fun getInstanceForEmailAddress(emailAddress: String, store: IMAPStore): IMAPEmailAccount {
-            return getInstanceForEmailAddress(emailAddress, store, HashBiMap.create())
+        fun getInstanceForEmailAddress(
+            accountContext: IMAPEmailAccountContext
+        ): IMAPEmailAccount {
+            return getInstanceForEmailAddress(accountContext, HashBiMap.create())
         }
 
         fun getInstanceForEmailAddress(
-            emailAddress: String,
-            store: IMAPStore,
-            specialFoldersBiMapping: BiMap<FolderSpecialUse, String>
+            accountContext: IMAPEmailAccountContext,
+            specialFoldersBiMapping: BiMap<FolderSpecialUse, String>,
         ): IMAPEmailAccount {
-            return when (extractDomainFromEmailAddress(emailAddress)) {
+            return when (extractDomainFromEmailAddress(accountContext.emailAddress)) {
                 "gmail.com" -> IMAPEmailAccountGmail(
-                    store,
+                    accountContext,
                     specialFoldersBiMapping
                 )
-                else -> IMAPEmailAccount(store, specialFoldersBiMapping)
+                else -> IMAPEmailAccount(accountContext, specialFoldersBiMapping)
             }
         }
 

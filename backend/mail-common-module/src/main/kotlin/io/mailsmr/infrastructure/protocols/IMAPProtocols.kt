@@ -1,4 +1,4 @@
-package io.mailsmr.infrastructure.imap
+package io.mailsmr.infrastructure.protocols
 
 import com.sun.mail.imap.IMAPProvider
 import com.sun.mail.imap.IMAPSSLProvider

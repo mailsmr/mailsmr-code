@@ -12,13 +12,17 @@ class EmailMessage internal constructor(
 
     fun getSubject(): String = imapMessage.nativeMessage.subject
 
-    fun getContent(): String = imapMessage.textFromMessage
+    fun getContent(): String = imapMessage.content
+    fun getContentPeek(): String = imapMessage.contentPeek
 
-    fun copyTo() {
+    fun getEnvelope(): EmailMessageEnvelope =
+        EmailMessageEnvelope.fromIMAPEmailEnvelope(imapMessage.getEmailEnvelope(imapFolder.accountContext.emailAddress))
+
+    fun copyTo(folder: EmailFolder) {
         TODO()
     }
 
-    fun moveTo() {
+    fun moveTo(folder: EmailFolder) {
         TODO()
     }
 

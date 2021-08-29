@@ -5,17 +5,24 @@ import com.icegreen.greenmail.util.DummySSLSocketFactory
 import com.icegreen.greenmail.util.GreenMailUtil
 import com.icegreen.greenmail.util.ServerSetup
 import com.icegreen.greenmail.util.ServerSetupTest
-import io.mailsmr.infrastructure.imap.IMAPProtocols
+import io.mailsmr.infrastructure.protocols.IMAPProtocols
+import io.mailsmr.infrastructure.protocols.SMTPProtocols
 import io.mailsmr.util.AESDecryptionUtil.encryptPassword
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.test.context.ContextConfiguration
 import java.security.Security
 
 
 @ContextConfiguration
-internal class EmailAccountAggregateIntegrationTest {
+internal class EmailAccountManagementAggregateIntegrationTest {
+    private val threadPoolTaskScheduler: ThreadPoolTaskScheduler = ThreadPoolTaskScheduler()
+
+    init {
+        threadPoolTaskScheduler.initialize()
+    }
 
     companion object {
         @JvmField
@@ -39,7 +46,7 @@ internal class EmailAccountAggregateIntegrationTest {
         )
 
         val dummySMTPCredentials = EmailAccountConnectionProperties.SMTPConnectionProperties(
-            "null",
+            SMTPProtocols.SMTP,
             "",
             0,
             "",
@@ -78,9 +85,9 @@ internal class EmailAccountAggregateIntegrationTest {
         )
 
         // act
-        val emailAccountAggregate = EmailAccountAggregate(emailAccountCredentials)
-        emailAccountAggregate.connectImap(encryptionPassword)
-        val folder = emailAccountAggregate.getFolders()[0]
+        val emailAccountManagementAggregate = EmailAccountManagementAggregate(emailAccountCredentials, threadPoolTaskScheduler.scheduledThreadPoolExecutor)
+        emailAccountManagementAggregate.connectImap(encryptionPassword)
+        val folder = emailAccountManagementAggregate.getFolders()[0]
         val messages = folder.getMessages()
 
         // assert
@@ -126,9 +133,9 @@ internal class EmailAccountAggregateIntegrationTest {
         )
 
         // act
-        val emailAccountAggregate = EmailAccountAggregate(emailAccountCredentials)
-        emailAccountAggregate.connectImap(encryptionPassword)
-        val folder = emailAccountAggregate.getFolders()[0]
+        val emailAccountManagementAggregate = EmailAccountManagementAggregate(emailAccountCredentials, threadPoolTaskScheduler.scheduledThreadPoolExecutor)
+        emailAccountManagementAggregate.connectImap(encryptionPassword)
+        val folder = emailAccountManagementAggregate.getFolders()[0]
         val messages = folder.getMessages()
 
         // assert

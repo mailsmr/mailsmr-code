@@ -8,95 +8,81 @@ import jakarta.mail.internet.MimeMessage.RecipientType.NEWSGROUPS
 import java.io.Serializable
 import java.util.*
 import java.util.stream.Collectors
-import jakarta.mail.Message.RecipientType.TO
 
-internal class IMAPEmailEnvelope(
-    private var uid: Long? = null,
-    private var messageId: String? = null,
-    private var from: List<String>? = null,
-    private var to: List<String>? = null,
-    private var cc: List<String>? = null,
-    private var bcc: List<String>? = null,
-    private var newsgroup: List<String>? = null,
-    private var replyTo: List<String>? = null,
-    private var sentDate: Date? = null,
-    private var receivedDate: Date? = null,
-    private var subject: String? = null,
-    private var folder: String? = null,
-    private var expunged: Boolean? = null,
-    private var answered: Boolean? = null,
-    private var deleted: Boolean? = null,
-    private var draft: Boolean? = null,
-    private var flagged: Boolean? = null,
-    private var recent: Boolean? = null,
-    private var seen: Boolean? = null,
-    private var receiverEmailAccountId: Int? = null
+internal data class IMAPEmailEnvelope(
+    val uid: Long,
+    val messageId: String,
+    val from: List<String>? = null,
+    val to: List<String>? = null,
+    val cc: List<String>? = null,
+    val bcc: List<String>? = null,
+    val newsgroup: List<String>? = null,
+    val replyTo: List<String>? = null,
+    val sentDate: Date? = null,
+    val receivedDate: Date? = null,
+    val subject: String? = null,
+    val folder: String,
+    val expunged: Boolean,
+    val answered: Boolean? = null,
+    val deleted: Boolean? = null,
+    val draft: Boolean? = null,
+    val flagged: Boolean? = null,
+    val recent: Boolean? = null,
+    val seen: Boolean? = null,
+    val receiverAccountEmailAddress: String,
+    val contentPeek: String? = null,
 ) : Serializable, Comparable<IMAPEmailEnvelope> {
 
-    constructor(IMAPEmail: IMAPEmailEnvelope) : this(
-        uid = IMAPEmail.uid,
-        messageId = IMAPEmail.messageId,
-        from = IMAPEmail.from,
-        to = IMAPEmail.to,
-        cc = IMAPEmail.cc,
-        bcc = IMAPEmail.bcc,
-        newsgroup = IMAPEmail.newsgroup,
-        replyTo = IMAPEmail.replyTo,
-        sentDate = IMAPEmail.sentDate,
-        receivedDate = IMAPEmail.receivedDate,
-        subject = IMAPEmail.subject,
-        expunged = IMAPEmail.expunged,
-        folder = IMAPEmail.folder,
-        answered = IMAPEmail.answered,
-        deleted = IMAPEmail.deleted,
-        draft = IMAPEmail.draft,
-        flagged = IMAPEmail.flagged,
-        recent = IMAPEmail.recent,
-        seen = IMAPEmail.seen,
-        receiverEmailAccountId = IMAPEmail.receiverEmailAccountId
-    )
-
-    override fun compareTo(e: IMAPEmailEnvelope): Int {
-        return this.receivedDate?.compareTo(e.receivedDate) ?: 0
+    override fun compareTo(other: IMAPEmailEnvelope): Int {
+        return this.receivedDate?.compareTo(other.receivedDate) ?: 0
     }
 
     companion object {
-        fun fromMessage(message: IMAPMessage, receiverEmailAccountId: Int): IMAPEmailEnvelope {
+        val NULL_INSTANCE = IMAPEmailEnvelope(
+            uid = Long.MIN_VALUE,
+            messageId = "NULL_INSTANCE",
+            folder = "NULL_INSTANCE",
+            expunged = false,
+            receiverAccountEmailAddress = "NULL_INSTANCE"
+        )
+
+        fun fromMessage(message: IMAPMessage, accountEmailAddress: String): IMAPEmailEnvelope {
             return if (message.nativeMessage.isExpunged) {
-                fromDeletedMessage(message, receiverEmailAccountId)
+                fromDeletedMessage(message, accountEmailAddress)
             } else {
-                fromExistingMessage(message, receiverEmailAccountId)
+                fromExistingMessage(message, accountEmailAddress)
             }
         }
 
-        fun fromMessages(messages: List<IMAPMessage>, receiverEmailAccountId: Int): List<IMAPEmailEnvelope> {
+        fun fromMessages(messages: List<IMAPMessage>, accountEmailAddress: String): List<IMAPEmailEnvelope> {
             return messages.stream().parallel()
-                .map { message: IMAPMessage -> fromMessage(message, receiverEmailAccountId) }
+                .map { message: IMAPMessage -> fromMessage(message, accountEmailAddress) }
                 .collect(Collectors.toList())
         }
 
-        private fun fromDeletedMessage(message: IMAPMessage, receiverEmailAccountId: Int): IMAPEmailEnvelope {
+        private fun fromDeletedMessage(message: IMAPMessage, accountEmailAddress: String): IMAPEmailEnvelope {
             val nativeMessage = message.nativeMessage
-            val emailEnvelope = IMAPEmailEnvelope()
-            emailEnvelope.uid = message.uid
-            emailEnvelope.messageId = message.messageId
-            emailEnvelope.expunged = nativeMessage.isExpunged
-            emailEnvelope.folder = nativeMessage.folder.fullName
-            emailEnvelope.receiverEmailAccountId = receiverEmailAccountId
-            return emailEnvelope
+
+            return IMAPEmailEnvelope(
+                uid = message.uid,
+                messageId = message.messageId,
+                expunged = nativeMessage.isExpunged,
+                folder = nativeMessage.folder.fullName,
+                receiverAccountEmailAddress = accountEmailAddress
+            )
         }
 
-        private fun fromExistingMessage(message: IMAPMessage, receiverEmailAccountId: Int): IMAPEmailEnvelope {
+        private fun fromExistingMessage(message: IMAPMessage, accountEmailAddress: String): IMAPEmailEnvelope {
             val nativeMessage = message.nativeMessage
             return IMAPEmailEnvelope(
                 message.uid,
                 message.messageId,
-                convertAddressArrayToStringList(nativeMessage.from),
-                convertAddressArrayToStringList(nativeMessage.getRecipients(TO)),
-                convertAddressArrayToStringList(nativeMessage.getRecipients(CC)),
-                convertAddressArrayToStringList(nativeMessage.getRecipients(BCC)),
-                convertAddressArrayToStringList(nativeMessage.getRecipients(NEWSGROUPS)),
-                convertAddressArrayToStringList(nativeMessage.replyTo),
+                convertAddressArrayToStringList(nativeMessage.from ?: emptyArray()),
+                convertAddressArrayToStringList(nativeMessage.getRecipients(TO) ?: emptyArray()),
+                convertAddressArrayToStringList(nativeMessage.getRecipients(CC) ?: emptyArray()),
+                convertAddressArrayToStringList(nativeMessage.getRecipients(BCC) ?: emptyArray()),
+                convertAddressArrayToStringList(nativeMessage.getRecipients(NEWSGROUPS) ?: emptyArray()),
+                convertAddressArrayToStringList(nativeMessage.replyTo ?: emptyArray()),
                 nativeMessage.sentDate,
                 nativeMessage.receivedDate,
                 nativeMessage.subject,
@@ -108,7 +94,34 @@ internal class IMAPEmailEnvelope(
                 nativeMessage.flags.contains(Flags.Flag.FLAGGED),
                 nativeMessage.flags.contains(Flags.Flag.RECENT),
                 nativeMessage.flags.contains(Flags.Flag.SEEN),
-                receiverEmailAccountId
+                accountEmailAddress,
+                message.contentPeek
+            )
+        }
+
+        fun clone(originalEnvelope: IMAPEmailEnvelope): IMAPEmailEnvelope {
+            return IMAPEmailEnvelope(
+                uid = originalEnvelope.uid,
+                messageId = originalEnvelope.messageId,
+                from = originalEnvelope.from,
+                to = originalEnvelope.to,
+                cc = originalEnvelope.cc,
+                bcc = originalEnvelope.bcc,
+                newsgroup = originalEnvelope.newsgroup,
+                replyTo = originalEnvelope.replyTo,
+                sentDate = originalEnvelope.sentDate,
+                receivedDate = originalEnvelope.receivedDate,
+                subject = originalEnvelope.subject,
+                expunged = originalEnvelope.expunged,
+                folder = originalEnvelope.folder,
+                answered = originalEnvelope.answered,
+                deleted = originalEnvelope.deleted,
+                draft = originalEnvelope.draft,
+                flagged = originalEnvelope.flagged,
+                recent = originalEnvelope.recent,
+                seen = originalEnvelope.seen,
+                receiverAccountEmailAddress = originalEnvelope.receiverAccountEmailAddress,
+                contentPeek = originalEnvelope.contentPeek,
             )
         }
 
@@ -117,12 +130,16 @@ internal class IMAPEmailEnvelope(
                 .parallel()
                 .map { address ->
                     val internetAddress: InternetAddress = address as InternetAddress
-                    val emailAddress: String = internetAddress.getAddress()
-                    val personal: String = internetAddress.getPersonal()
-                    return@map String.format("%s <%s>", personal, emailAddress)
+                    val emailAddress: String = internetAddress.address
+                    val personal: String? = internetAddress.personal
+
+                    if (personal != null) {
+                        return@map String.format("%s <%s>", personal, emailAddress)
+                    } else {
+                        return@map emailAddress
+                    }
                 }
                 .collect(Collectors.toList())
         }
     }
-
 }

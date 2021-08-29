@@ -9,36 +9,44 @@ import mu.KotlinLogging
 /**
  * Based on https://javaee.github.io/javamail/FAQ#mainbody
  */
-internal class IMAPMessageContent(private val nativeMessage: IMAPMessage) {
+internal class IMAPMessageContent(private val nativeMessage: IMAPMessage, private val peek: Boolean = false) {
     private val logger = KotlinLogging.logger {}
 
     private var isTextHtml = false
 
-    var content: String = ""
-        get() {
-            return getTextOfMessage()
-        }
-        private set
+    fun content() = getTextOfMessage()
 
     private fun getTextOfMessage(): String {
+        nativeMessage.peek = peek
+
         return if (nativeMessage.isMimeType(MIME_TYPE_TEXT_PLAIN)) {
             nativeMessage.content.toString()
         } else {
             val mimeMultipart: MimeMultipart = nativeMessage.content as MimeMultipart
-            getText(mimeMultipart.parent)
+            if (peek) {
+                getText(mimeMultipart.getBodyPart(0))
+            } else {
+                getText(mimeMultipart.parent)
+            }
         }
     }
 
     private fun getText(part: Part): String {
-        if (part.isMimeType(MIME_TYPE_TEXT)) {
-            return handleMimeTypeText(part)
-        } else if (part.isMimeType(MIME_TYPE_MULTIPART_ALTERNATIVE)) {
-            return handleMimeTypeMultipartAlternative(part)
-        } else if (part.isMimeType(MIME_TYPE_MULTIPART)) {
-            return handleMimeTypeMultipartExceptAlternative(part)
+        return when {
+            part.isMimeType(MIME_TYPE_TEXT) -> {
+                handleMimeTypeText(part)
+            }
+            part.isMimeType(MIME_TYPE_MULTIPART_ALTERNATIVE) -> {
+                handleMimeTypeMultipartAlternative(part)
+            }
+            part.isMimeType(MIME_TYPE_MULTIPART) -> {
+                handleMimeTypeMultipartExceptAlternative(part)
+            }
+            else -> {
+                logger.warn { "${part.contentType} is not supported." }
+                ""
+            }
         }
-        logger.warn(java.lang.String.format("%s is not supported.", part.contentType))
-        return ""
     }
 
     private fun handleMimeTypeText(part: Part): String {

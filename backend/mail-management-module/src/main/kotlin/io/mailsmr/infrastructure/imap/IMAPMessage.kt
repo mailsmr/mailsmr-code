@@ -2,26 +2,36 @@ package io.mailsmr.infrastructure.imap
 
 import com.sun.mail.imap.IMAPFolder
 import jakarta.mail.Message
-import mu.KotlinLogging
 import java.util.*
 import java.util.stream.Collectors
 
 internal class IMAPMessage(
     val nativeMessage: com.sun.mail.imap.IMAPMessage
 ) {
-    private val logger = KotlinLogging.logger {}
 
-    val uid: Long
-    val messageId: String
-
-    fun getEmailEnvelope(receiverEmailAccountId: Int): IMAPEmailEnvelope {
-        return IMAPEmailEnvelope.fromMessage(this, receiverEmailAccountId)
+    val uid: Long = try {
+        (nativeMessage.folder as IMAPFolder).getUID(nativeMessage)
+    } catch (e: Exception) {
+        UID_UNAVAILABLE.toLong()
+    }
+    val messageId: String = try {
+        nativeMessage.messageID
+    } catch (e: Exception) {
+        "NOT AVAILABLE"
     }
 
-    val textFromMessage: String
+    fun getEmailEnvelope(accountEmailAddress: String): IMAPEmailEnvelope {
+        return IMAPEmailEnvelope.fromMessage(this, accountEmailAddress)
+    }
+
+    val content: String
         get() {
-            val imapMessageContent = IMAPMessageContent(nativeMessage)
-            return imapMessageContent.content
+            return IMAPMessageContent(nativeMessage).content()
+        }
+
+    val contentPeek: String
+        get() {
+            return IMAPMessageContent(nativeMessage, true).content()
         }
 
     companion object {
@@ -33,23 +43,9 @@ internal class IMAPMessage(
 
         fun getFromNativeMessages(messagesArray: Array<Message>): List<IMAPMessage> {
             return Arrays.stream(messagesArray)
+                .parallel()
                 .map(Companion::getFromNativeMessage)
                 .collect(Collectors.toList())
         }
-    }
-
-    init {
-        val tempUid: Long = try {
-            (nativeMessage.folder as IMAPFolder).getUID(nativeMessage)
-        } catch (e: Exception) {
-            UID_UNAVAILABLE.toLong()
-        }
-        uid = tempUid
-        val tempMessageId: String = try {
-            nativeMessage.messageID
-        } catch (e: Exception) {
-            "NOT AVAILABLE"
-        }
-        messageId = tempMessageId
     }
 }

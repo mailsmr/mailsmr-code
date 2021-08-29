@@ -87,7 +87,7 @@ subprojects {
 
 
     dependencies {
-        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.springframework.boot:spring-boot-starter-web:2.5.4")
 
         //  - SUPPORT
         implementation("com.google.code.gson:gson:2.8.6")
@@ -95,8 +95,8 @@ subprojects {
         //  - CORE
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        implementation("io.github.microutils:kotlin-logging:1.12.0")
-        implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
+        implementation("io.github.microutils:kotlin-logging:2.0.11")
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
 
         //  ===== ANNOTATIONS =====
         annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

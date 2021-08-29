@@ -1,6 +1,7 @@
 package io.mailsmr.domain
 
-import io.mailsmr.infrastructure.imap.IMAPProtocols
+import io.mailsmr.infrastructure.protocols.IMAPProtocols
+import io.mailsmr.infrastructure.protocols.SMTPProtocols
 
 data class EmailAccountConnectionProperties(
     val imap: IMAPConnectionProperties,
@@ -17,7 +18,7 @@ data class EmailAccountConnectionProperties(
     )
 
     data class SMTPConnectionProperties(
-        val protocol: Any, // SMTPProtocols
+        val protocol: SMTPProtocols,
         val address: String,
         val port: Int,
 
